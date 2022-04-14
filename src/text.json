@@ -1,0 +1,9 @@
+{
+    "uploadPrompt": "Ladda upp fil",
+    "searchButtonText": "Sök",
+    "searchBoxHeader": "Check Registry",
+    "searchBoxInputPrompt": "Org/Pnr/Knr:",
+    "registerButtonText": "Registrera",
+    "registerCheckboxPrompt": "Fullmaktshavare",
+    "additionalInputPrompt": "Fullmaktshavare Org/Pnr/Knr:"
+}
