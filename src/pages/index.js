@@ -26,8 +26,10 @@ export default function Home() {
             </Head>
 
             <main className={styles.main}>
+                { "loaded: " + loaded }
                 <AppContext>
                     { loaded && <Main/> }
+                    { !loaded && "Connecting..."}
                 </AppContext>
             </main>
         </div>
