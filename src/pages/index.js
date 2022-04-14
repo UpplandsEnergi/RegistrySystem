@@ -7,7 +7,6 @@ import styles from '../styles/Home.module.css'
 export default function Home() {
     
     const [loaded, setLoaded] = useState(false)
-    const [debug, setDebug] = useState(false)
 
     useEffect(() => 
     {
@@ -15,11 +14,6 @@ export default function Home() {
         fetch('api/database/isConnected', { method: 'GET' })
         .then((res) => res.json())
         .then((res) => setLoaded(Boolean(res?.connected )))
-        .catch(console.error)
-
-        fetch('api/database/debug', { method: 'GET' })
-        .then((res) => res.json())
-        .then((res) => setDebug(res))
         .catch(console.error)
     }, [])
 
@@ -32,7 +26,6 @@ export default function Home() {
             </Head>
 
             <main className={styles.main}>
-                { "loaded: " + JSON.stringify(debug) }
                 <AppContext>
                     { loaded && <Main/> }
                     { !loaded && "Connecting..." }
