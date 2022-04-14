@@ -14,6 +14,9 @@ export default async function handler(req, res) {
                 if (!Database.isConnected) await Database.connect()
                 return res.status(200).json({ connected: Database.isConnected })
 
+            case 'debug':
+                return res.status(400).json({ result: process.env })
+
             default:
                 return res.status(400)
         }
