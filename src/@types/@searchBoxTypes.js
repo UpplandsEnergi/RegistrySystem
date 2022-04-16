@@ -1,12 +1,17 @@
 
-
+/**
+ * @typedef SearchBoxMatchState
+ * @property {number} type
+ * @property {FileContent} value
+ */
 
 /**
  * @typedef SearchBoxState
  * @property {string} search
+ * @property {SearchBoxMatchState} match
  * @property {{
  *     type: number,
- *     value: FileContent
- *     check: boolean
- * }} match
+ *     search: string,
+ *     match: SearchBoxMatchState
+ * }} additional
  */

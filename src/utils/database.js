@@ -22,13 +22,25 @@ class Database
         return { success: false, result: null }
     }
 
+    /**
+     * @returns {Promise<{ success: boolean, result: * }>}
+     */
     static async connect()
     {
         if (!this.isConnected)
         {
             try
             {
-                this.#connection = await MongoClient.connect(process.env.MONGODB_URI)
+                let client;
+                if (!global._mongoClientPromise) {
+                    client = await MongoClient.connect(process.env.MONGODB_URI)
+                    global._mongoClientPromise = client.connect();
+                }
+                else {
+                    client = global._mongoClientPromise
+                }
+
+                this.#connection = await client;
                 this.#isConnected = true;
                 return this.#success(this.#connection);
             }
@@ -42,15 +54,22 @@ class Database
         }
     }
 
-    static async matchID(knr)
+    /**
+     * @param {string} knr 
+     * @param {boolean} checkProxy
+     * @returns {Promise<{ success: boolean, result: * }>}
+     */
+    static async matchID(knr, checkProxy = false)
     {
         try 
         {
-            if (!knr || (!this.isConnected && !await this.connect())) return this.#failure();
+            if (!knr) return this.#failure();
 
             let database = this.#connection.db(process.env.MONGODB_DB);
             let collection = database.collection('People');
-            let result = await collection.findOne({ knr: String(knr) });
+            let result = await collection.findOne( checkProxy 
+                ? { $or: [{ knr: String(knr) }, { proxy: String(knr) }] } 
+                : { knr: String(knr) });
             return this.#success(Boolean(result)); 
         }
         catch (error) 
@@ -60,17 +79,66 @@ class Database
         }
     }
 
-    static async add(knr, value) 
+    /**
+     * @param {string} knr 
+     * @param {number} type
+     * @param {boolean} another
+     * @param {?string} proxy
+     * @returns {Promise<{ success: boolean, result: * }>}
+     */
+    static async add(knr, type, another, proxy) 
     {
         try 
         {
-            if (!knr || (!this.isConnected && !await this.connect())) return null;
+            if (!knr) return this.#failure();
 
             let database = this.#connection.db(process.env.MONGODB_DB);
             let collection = database.collection('People');
-            let result = await collection.insertOne({ knr: String(knr), value: value });
+            let doc = { knr: String(knr), type: type, another: another }
+            if (proxy) {
+                doc.proxy = String(proxy);
+            }
+            let result = await collection.insertOne(doc);
             return this.#success(Boolean(result?.insertedId));
         }
+        catch (error) 
+        {
+            console.error(error)
+            return this.#failure();
+        }
+    }
+
+    /**
+     * @returns {Promise<{ success: boolean, result: * }>}
+     */
+    static async getData()
+    {
+        try 
+        {
+            let database = this.#connection.db(process.env.MONGODB_DB);
+            let collection = database.collection('People');
+            let result = await collection.find({}, { projection: {_id: false }}).toArray();
+            return this.#success(result);
+        } 
+        catch (error) 
+        {
+            console.error(error)
+            return this.#failure();
+        }
+    }
+
+    /**
+     * @returns {Promise<{ success: boolean, result: * }>}
+     */
+    static async clearData()
+    {
+        try 
+        {
+            let database = this.#connection.db(process.env.MONGODB_DB);
+            let collection = database.collection('People');
+            let result = await collection.deleteMany({})
+            return this.#success(result);
+        } 
         catch (error) 
         {
             console.error(error)

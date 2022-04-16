@@ -20,4 +20,13 @@ const XLSXParser = (file) => {
     })
 }
 
+export const ToXLSX = (file) => {
+    const XLSX = require('xlsx')
+    let ws = XLSX.utils.json_to_sheet(Object.values(file))
+    let wb = { Sheets: { 'data': ws }, SheetNames: ['data'] };
+    let buffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+    let blob = new Blob([buffer], { type: 'xlsx' });
+    return blob;
+}
+
 export default XLSXParser;

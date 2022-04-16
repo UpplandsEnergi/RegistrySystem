@@ -1,0 +1,172 @@
+.analyticsContainer {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.analytics {
+    display: flex;
+    width: max(500px, 40%);
+    min-width: 400px;
+    min-width: 200px;
+    background-color: rgb(110, 232, 96);
+    border: 2px solid black;
+    border-radius: 20px;
+    flex-direction: column;
+}
+
+.analyticsHeader {
+    flex: 1;
+    max-height: 40px;
+    padding: 10px;
+    border-bottom: 2px solid black;
+    background-color: rgba(0, 0, 0, 0.129);
+    font-weight: bold;
+    font-size: large;
+    text-align: center;
+    color: rgb(0, 0, 0);
+}
+
+.analyticsContent {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 10px;
+}
+
+.analyticsDisplay {
+    height: fit-content;
+    min-width: fit-content;
+    border: 1px solid black;
+    background-color: rgb(235, 241, 255);
+    border-radius: 15px;
+    padding: 5px;
+    margin-bottom: 10px;
+    max-height: max(200px, 40%);
+    overflow-y: auto;
+}
+
+.analyticsDisplay > div {
+    display: flex;
+    margin: 3px;
+    overflow: hidden;
+    text-overflow: clip;
+}
+
+.analyticsDisplay > * > header {
+    font-weight: bold;
+    width: 200px;
+    min-width: 200px;
+}
+
+button.analyticsButton {
+    width: 120px;
+    height: 30px;
+    background-color: rgb(164, 255, 159);
+    border: 1px solid black;
+    border-radius: 15px;
+    margin-left: 5px;
+    font-weight: bold;
+    user-select: none;
+    cursor: pointer;
+}
+
+button.analyticsButton:not([disabled]):hover {
+    background-color: rgb(141, 221, 137);
+}
+
+button.analyticsButton:not([disabled]):active {
+    background-color: rgb(116, 197, 118);
+}
+
+button.analyticsButton.dangerous {
+    background-color: rgb(255, 159, 159)
+}
+
+button.analyticsButton.dangerous:not([disabled]):hover {
+    background-color: rgb(217, 130, 130)
+}
+
+button.analyticsButton.dangerous:not([disabled]):active {
+    background-color: rgb(194, 105, 105)
+}
+
+.analyticsContentRow {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+}
+
+.analyticsStatus {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    width: 90px;
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 15px;
+    margin-left: auto;
+    right: 0;
+    font-weight: bold;
+    font-size: medium;
+    user-select: none;
+}
+
+.analyticsPopupBackground {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.analyticsPopup {
+    width: 350px;
+    height: max(100px, fit-content);
+    background-color: white;
+    border: 2px solid black;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    font-weight: bold;
+}
+
+.analyticsPopup > div {
+    display: flex;
+    flex: 1;
+    width: 100%;
+    padding-top: 10px;
+    margin-top: 10px;
+    border-top: 1px solid black;
+}
+
+button.analyticsPopupButton {
+    margin-top: 10px;
+    width: 120px;
+    height: 30px;
+    background-color: rgb(242, 242, 242);
+    border: 1px solid black;
+    border-radius: 15px;
+    margin-left: 5px;
+    font-weight: bold;
+    user-select: none;
+    cursor: pointer;
+    margin: auto;
+}
+
+button.analyticsPopupButton:not([disabled]):hover {
+    background-color: rgb(214, 214, 214);
+}
+
+button.analyticsPopupButton:not([disabled]):active {
+    background-color: rgb(198, 198, 198);
+}

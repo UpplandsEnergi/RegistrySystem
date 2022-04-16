@@ -9,7 +9,7 @@
 
 .searchBox {
     display: flex;
-    width: max(60%, 400px);
+    width: max(min(60%, 800px), 500px);
     background-color: rgb(96, 139, 232);
     border: 2px solid black;
     border-radius: 20px;
@@ -35,43 +35,10 @@
     padding: 10px;
 }
 
-.searchBoxContentRow {
-    display: flex;
-    flex-direction: row;
-    flex: 1;
-    max-height: 30px;
-    height: 30px;
-}
-
-input.searchBoxInput {
-    flex: 1;
-    background-color: rgb(209, 224, 255);
-    border: 1px solid black;
-    border-radius: 15px;
-    padding: 0 10px 0 10px;
-}
-
-button.searchBoxInputButton {
-    width: 60px;
-    background-color: rgb(209, 224, 255);
-    border: 1px solid black;
-    border-radius: 15px;
-    margin-left: 5px;
-}
-
-button.searchBoxInputButton:hover {
-    background-color: rgb(194, 214, 255);
-}
-
-button.searchBoxInputButton:active {
-    background-color: rgb(159, 191, 255);
-}
-
 .searchBoxDisplay {
     height: fit-content;
     min-height: 100px;
     min-width: fit-content;
-    margin-top: 6px;
     border: 1px solid black;
     background-color: rgb(235, 241, 255);
     border-radius: 15px;
@@ -91,7 +58,42 @@ button.searchBoxInputButton:active {
     min-width: 180px;
 }
 
-.searchBoxPrompt {
+.searchBarRow {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    max-height: 30px;
+    height: 30px;
+}
+
+input.searchBarRowInput {
+    flex: 1;
+    background-color: rgb(209, 224, 255);
+    border: 1px solid black;
+    border-radius: 15px;
+    padding: 0 12px 0 12px;
+}
+
+button.searchBarRowButton {
+    width: 60px;
+    background-color: rgb(209, 224, 255);
+    border: 1px solid black;
+    border-radius: 15px;
+    margin-left: 5px;
+    font-weight: bold;
+    user-select: none;
+    cursor: pointer;
+}
+
+button.searchBarRowButton:not([disabled]):hover {
+    background-color: rgb(194, 214, 255);
+}
+
+button.searchBarRowButton:not([disabled]):active {
+    background-color: rgb(159, 191, 255);
+}
+
+.searchBarRowPrompt {
     display: flex;
     width: max(140px, fit-content);
     height: 30px;
@@ -106,10 +108,6 @@ button.searchBoxInputButton:active {
     flex-direction: row;
     justify-content: right;
     margin-top: 10px;
-    border: 1px solid black;
-    background-color: rgb(235, 241, 255);
-    border-radius: 15px;
-    padding: 5px 10px 5px 10px;
 }
 
 .registerContainer > button {
@@ -120,14 +118,31 @@ button.searchBoxInputButton:active {
     border-radius: 15px;
     margin-left: 5px;
     font-weight: bold;
+    user-select: none;
+    cursor: pointer;
 }
 
 .registerCheckboxGroup {
     display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: left;
+    justify-content: center;
+    margin-right: auto;
+    border: 1px solid black;
+    background-color: rgb(235, 241, 255);
+    border-radius: 15px;
+    padding: 5px 20px 5px 10px;
+}
+
+.registerCheckboxRow {
+    display: flex;
     flex-direction: row;
     height: 30px;
+    width: 300px;
+    min-width: fit-content;
     align-items: center;
-    justify-content: center;
+    justify-content: left;
     margin-right: auto;
 }
 
@@ -147,8 +162,4 @@ button.searchBoxInputButton:active {
     background-color: rgb(235, 241, 255);
     text-align: center;
     color: red;
-}
-
-.searchBoxDisplayContainer > * {
-    margin-top: 10px;
 }

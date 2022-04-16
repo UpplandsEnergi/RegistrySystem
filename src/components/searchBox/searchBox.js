@@ -1,17 +1,28 @@
 import { useContext, useState } from 'react'
 import { Context } from '../appContext'
 import SearchBoxContent from './searchBoxContent'
+import SearchBoxDisplay from './searchBoxDisplay'
+import SearchBoxRegisterRow from './searchBoxRegisterRow'
 import styles from '../../styles/searchBox.module.css'
 
 export const MatchType = {
-    Success: 0,
-    Fail: 1,
-    Registered: 2,
-    DatabaseError: 3,
-    Done: 4,
-    MatchingAdditional: 5,
-    None: 6
+    None: 0,
+    Success: 1,
+    Fail: 2,
+    Registered: 3,
+    DatabaseError: 4,
+    Done: 5,
+    MatchingAdditional: 6
 }
+
+export const AdditionalType = {
+    None: 0,
+    Related: 1,
+    Proxy: 2
+}
+
+const knrKey = 'Kund ID'
+const pnrKey = 'Org/Pnr';
 
 /**
  * @returns {JSX.Element}
@@ -24,9 +35,14 @@ const SearchBox = () =>
         search: "",
         match: {
             type: MatchType.None,
-            value: null,
-            check: false
-        } 
+            value: null
+        },
+        another: false,
+        additional: {
+            type: AdditionalType.None,
+            search: "",
+            match: { type: MatchType.None, value: null }
+        }
     });
 
     return (
@@ -39,8 +55,36 @@ const SearchBox = () =>
                     label={data.text.searchBoxInputPrompt}
                     state={state}
                     setState={setState}
-                    value={state.search}
+                    knrKey={knrKey}
+                    pnrKey={pnrKey}
                 />
+                { state.match.type === MatchType.Success &&
+                    <div className={styles.searchBoxContent}> 
+                        <SearchBoxDisplay state={state}/>
+                        <SearchBoxRegisterRow
+                            state={state} 
+                            setState={setState}
+                            knrKey={knrKey}
+                        />
+                    </div>
+                }
+                { state.additional.type === AdditionalType.Proxy &&
+                    <>
+                        <SearchBoxContent 
+                            label={data.text.additionalInputPrompt}
+                            state={state}
+                            setState={setState}
+                            knrKey={knrKey}
+                            pnrKey={pnrKey}
+                            isAdditional={true}
+                        />
+                        { state.additional.match.type === MatchType.Success &&
+                            <div className={styles.searchBoxContent}> 
+                                <SearchBoxDisplay state={state.additional}/>
+                            </div>
+                        }
+                    </>
+                }
             </div>
         </div>
     )

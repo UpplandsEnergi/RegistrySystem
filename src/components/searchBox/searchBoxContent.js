@@ -1,8 +1,8 @@
 import { useContext } from 'react'
 import { Context } from '../appContext'
-import { MatchType } from './searchBox'
+import { AdditionalType, MatchType } from './searchBox'
 import SearchBoxMessageHolder from './searchBoxMessageHolder'
-import SearchBoxDisplay from './searchBoxDisplay'
+import SearchBarRow from './searchBarRow'
 import styles from '../../styles/searchBox.module.css'
 import '../../@types/@searchBoxTypes'
 
@@ -11,79 +11,74 @@ import '../../@types/@searchBoxTypes'
  *     label: string,
  *     state: SearchBoxState,
  *     setState: import('react').Dispatch<SearchBoxState>,
- *     parentState: ?SearchBoxState,
- *     onlyShowContent: boolean
+ *     knrKey: string,
+ *     pnrKey: string,
+ *     isAdditional: boolean
  * }}
  * @returns {JSX.Element}
  */
-const SearchBoxContent = ({ label, state, setState, parentState = null, onlyShowContent = false }) => 
+const SearchBoxContent = ({ label, state, setState, knrKey, pnrKey, isAdditional = false }) => 
 {
     const { data } = useContext(Context);
+
+    let localState = isAdditional ? state.additional : state;
+    let setLocalState = isAdditional ? (value) => setState({ ...state, additional: value }) : setState;
 
     const cmp = (a, b) => String(a).toLowerCase() === String(b).toLowerCase()
 
     const findPerson = (pid) => {
         return Object.values(data.file)
-            .filter((row) => cmp(row["Org/Pnr"], pid) || cmp(row["Kund ID"], pid))
+            .filter((row) => cmp(row[pnrKey], pid) || cmp(row[knrKey], pid))
     }
 
-    const matchApiCall = async (pid) => {
-        try 
-        {
-            let match = findPerson(pid)
+    const matchApiCall = async () => {
+        let result = { 
+            ...localState,
+            match: {
+                ...localState.match,
+                type:  MatchType.Fail,
+                value: null
+            }
+        }
+
+        if (!isAdditional){
+            result.another = false;
+            result.additional = {
+                type: AdditionalType.None,
+                match: { type: MatchType.None, value: null },
+                search: ""
+            }
+        }
+
+        try {
+            let match = findPerson(localState.search)
             
             if (match && match[0]) {
-                let knr = match[0]['Kund ID'];
-                if (parentState && parentState?.match?.value && cmp(knr, parentState.match.value['Kund ID'])) {
-                    setState({ 
-                        ...state, 
-                        match: {  
-                            type: MatchType.MatchingAdditional,
-                            value: null,
-                            check: false
-                        }
-                    })
+                let knr = match[0][knrKey]
+                let response = await fetch('api/database/check', { 
+                    method: "PUT", 
+                    body: JSON.stringify({ knr: knr, checkProxy: isAdditional })
+                });
+                let value = await response?.json();
+
+                if (isAdditional && cmp(knr, state.match.value[knrKey]))
+                {
+                    result.match.type = MatchType.MatchingAdditional
                 }
                 else
                 {
-                    let response = await fetch('api/database/check', { 
-                        method: "PUT", 
-                        body: JSON.stringify({ knr: knr })
-                    });
-                    let responseValue = await response?.json();
-                    setState({ 
-                        ...state, 
-                        match: {
-                            type: responseValue.success && !responseValue.result 
-                                ? MatchType.Success 
-                                : MatchType.Registered,
-                            value: match[0],
-                            check: false
-                        }
-                    });
+                    result.match.type = value.success && !value.result 
+                        ? MatchType.Success 
+                        : MatchType.Registered;
+                    result.match.value = match[0];
                 }
-            }
-            else {
-                setState({ 
-                    ...state, 
-                    match: {  
-                        type: MatchType.Fail,
-                        value: null,
-                        check: false
-                    }
-                });
             }
         } 
         catch (error) {
             console.error(error)
-            setState({ 
-                ...state, 
-                match: {  
-                    type: MatchType.Fail,
-                    value: null,
-                    check: false
-                }
-            })
+        }
+        finally {
+            setLocalState(result);
         }
     }
 
@@ -91,28 +86,22 @@ const SearchBoxContent = ({ label, state, setState, parentState = null, onlyShow
         switch (type)
         {
             case MatchType.Success:
-                return (
-                    <SearchBoxDisplay 
-                        state={state} 
-                        setState={setState} 
-                        onlyShowContent={onlyShowContent}
-                    />
-                );
+                return null;
 
             case MatchType.Fail:
-                return <SearchBoxMessageHolder text="Matchar ingen kund"/>;
+                return <SearchBoxMessageHolder text={data.text.messageFail}/>;
 
             case MatchType.Registered:
-                return <SearchBoxMessageHolder text="Personen är redan registrerad"/>;
+                return <SearchBoxMessageHolder text={data.text.messageRegistered}/>;
 
             case MatchType.DatabaseError:
-                return <SearchBoxMessageHolder text="Misslyckades registrera"/>;
+                return <SearchBoxMessageHolder text={data.text.messageDatabaseError}/>;
 
             case MatchType.Done:
-                return <SearchBoxMessageHolder text="Personen är nu registrerad"/>;
+                return <SearchBoxMessageHolder text={data.text.messageDone}/>;
 
             case MatchType.MatchingAdditional:
-                return <SearchBoxMessageHolder text="Medföljare kan inte vara samma"/>;
+                return <SearchBoxMessageHolder text={data.text.messageMatchingAdditional}/>;
 
             default:
                 return null;
@@ -121,24 +110,14 @@ const SearchBoxContent = ({ label, state, setState, parentState = null, onlyShow
 
     return (
         <div className={styles.searchBoxContent}>
-            <div className={styles.searchBoxContentRow}>
-                <div className={styles.searchBoxPrompt}> 
-                    { label } 
-                </div>
-                <input
-                    className={styles.searchBoxInput}
-                    value={state.search} 
-                    onChange={(e) => setState({ ...state, search: e.target.value })}
-                />
-                <button
-                    className={styles.searchBoxInputButton}
-                    onClick={() => matchApiCall(state.search)}
-                >
-                    {data.text.searchButtonText}
-                </button>
-            </div>
-            { getContent(state.match.type) }
-        </div> 
+            <SearchBarRow
+                text={localState.search}
+                setText={(value) => setLocalState({ ...localState, search: value })}
+                onClick={() => matchApiCall().catch(console.error())}
+                label={label}
+            />
+            { getContent(localState.match.type) }
+        </div>
     )
 }
 
