@@ -112,7 +112,7 @@ const Analytics = () => {
                     }}/>
                     <div className={styles.analyticsContentRow}>
                         <button
-                            //disabled={state.numVoters === 0}
+                            disabled={state.numVoters === 0}
                             className={styles.analyticsButton + ' ' + styles.dangerous}
                             onClick={() => setPopup(true)}
                         >
