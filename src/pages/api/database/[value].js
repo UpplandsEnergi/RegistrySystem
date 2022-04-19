@@ -23,6 +23,9 @@ export default async function handler(req, res) {
             case 'clearData':
                 return res.status(200).json(await Database.clearData());
 
+            case 'debug':
+                return res.status(200).json(await Database.debug())
+
             default:
                 return res.status(400);
         }

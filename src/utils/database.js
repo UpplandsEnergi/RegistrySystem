@@ -143,6 +143,27 @@ class Database
             return this.#failure();
         }
     }
+
+    static async debug()
+    {
+        try 
+        {
+            let database = this.#connection.db(process.env.MONGODB_DB);
+            let collection = database.collection('People');
+            let result = await collection.aggregate([
+                {"$group" : { "_id": "$knr", "count": { "$sum": 1 } } },
+                {"$match": { "count" : {"$gt": 1} } }, 
+                {"$project": {"knr" : "$_id", "_id" : 0} }
+            ]).toArray();
+            console.log(JSON.stringify(result));
+            return this.#success(result);
+        } 
+        catch (error) 
+        {
+            console.error(error)
+            return this.#failure();
+        }
+    }
 }
 
 export default Database;
