@@ -108,7 +108,7 @@ const Analytics = () => {
                         [data.text.numWithoutProxy]: state.numNonProxy,
                         [data.text.numProxy]: state.numProxy,
                         [data.text.numOthers]: state.numOthers,
-                        [data.text.numTotal]: state.numOthers + state.numVoters
+                        [data.text.numTotal]: state.numOthers + state.numVoters - state.numProxy
                     }}/>
                     <div className={styles.analyticsContentRow}>
                         <button
