@@ -4,6 +4,7 @@ import { ToXLSX } from '../../utils/xlsxParser';
 import AnalyticsDisplay from './analyticsDisplay';
 import AnalyticsPopup from './analyticsPopup';
 import styles from '../../styles/analytics.module.css'
+import { AdditionalType } from '../searchBox/searchBox';
 
 const AnalyticsStatus = {
     None: 0,
@@ -18,7 +19,9 @@ const Analytics = () => {
     const [state, setState] = useState({
         status: AnalyticsStatus.None,
         numVoters: 0,
+        numProxy: 0,
         numOthers: 0,
+        numNonProxy: 0,
         data: {}
     });
     const ref = useRef(null)
@@ -27,8 +30,10 @@ const Analytics = () => {
         let result = {
             ...state,
             status: AnalyticsStatus.Error,
-            numOthers: 0,
             numVoters: 0,
+            numProxy: 0,
+            numOthers: 0,
+            numNonProxy: 0,
             data: {}
         }
 
@@ -37,15 +42,19 @@ const Analytics = () => {
             let responseValue = await response?.json();
             if (responseValue && responseValue.result)
             {
-                let counts = responseValue.result.reduce(({ voters, others }, res) => ({
-                    voters: voters + 1, 
-                    others: res.another ? others + 1 : others
-                }), { voters: 0, others: 0 });
+                let counts = responseValue.result.reduce(({ voters, proxy, others, nonProxy }, res) => ({
+                    voters: voters + 1,
+                    proxy: res.proxy ? proxy + 1 : proxy,
+                    others: res.another ? others + 1 : others,
+                    nonProxy: res.type === AdditionalType.None ? nonProxy + 1 : nonProxy
+                }), { voters: 0, proxy: 0, others: 0, nonProxy: 0 });
                 let data = {}
                 responseValue.result.forEach((res) => data[res.knr] = res)
                 result.status = AnalyticsStatus.Success;
                 result.numVoters = counts.voters;
                 result.numOthers = counts.others;
+                result.numProxy = counts.proxy;
+                result.numNonProxy = counts.nonProxy;
                 result.data = data;
             }
         }
@@ -97,12 +106,14 @@ const Analytics = () => {
                 <div className={styles.analyticsContent}>
                     <AnalyticsDisplay state={{ 
                         [data.text.numVoters]: state.numVoters,
+                        [data.text.numWithoutProxy]: state.numNonProxy,
+                        [data.text.numProxy]: state.numProxy,
                         [data.text.numOthers]: state.numOthers,
                         [data.text.numTotal]: state.numOthers + state.numVoters
                     }}/>
                     <div className={styles.analyticsContentRow}>
                         <button
-                            disabled={state.numVoters === 0}
+                            //disabled={state.numVoters === 0}
                             className={styles.analyticsButton + ' ' + styles.dangerous}
                             onClick={() => setPopup(true)}
                         >

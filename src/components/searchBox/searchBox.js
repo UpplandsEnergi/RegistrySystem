@@ -12,7 +12,8 @@ export const MatchType = {
     Registered: 3,
     DatabaseError: 4,
     Done: 5,
-    MatchingAdditional: 6
+    MatchingAdditional: 6,
+    AlreadyProxy: 7
 }
 
 export const AdditionalType = {

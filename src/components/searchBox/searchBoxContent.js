@@ -55,21 +55,32 @@ const SearchBoxContent = ({ label, state, setState, knrKey, pnrKey, isAdditional
             
             if (match && match[0]) {
                 let knr = match[0][knrKey]
-                let response = await fetch('api/database/check', { 
-                    method: "PUT", 
-                    body: JSON.stringify({ knr: knr, checkProxy: isAdditional })
-                });
-                let value = await response?.json();
-
                 if (isAdditional && cmp(knr, state.match.value[knrKey]))
                 {
                     result.match.type = MatchType.MatchingAdditional
                 }
                 else
                 {
-                    result.match.type = value.success && !value.result 
-                        ? MatchType.Success 
-                        : MatchType.Registered;
+                    let response = await fetch('api/database/check', { 
+                        method: "PUT", 
+                        body: JSON.stringify({ knr: knr })
+                    });
+                    let value = await response?.json();
+                    if (value.success) {
+                        if (isAdditional) {
+                            result.match.type = value.result.proxy 
+                                ? MatchType.AlreadyProxy
+                                : MatchType.Success
+                        }
+                        else {
+                            result.match.type = value.result.knr 
+                                ? MatchType.Registered
+                                : MatchType.Success
+                        }
+                    }
+                    else {
+                        result.match.type = MatchType.DatabaseError
+                    }
                     result.match.value = match[0];
                 }
             }
@@ -102,6 +113,9 @@ const SearchBoxContent = ({ label, state, setState, knrKey, pnrKey, isAdditional
 
             case MatchType.MatchingAdditional:
                 return <SearchBoxMessageHolder text={data.text.messageMatchingAdditional}/>;
+
+            case MatchType.AlreadyProxy:
+                return <SearchBoxMessageHolder text={data.text.messageAlreadyProxy}/>;
 
             default:
                 return null;

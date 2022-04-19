@@ -33,10 +33,13 @@ export default async function handler(req, res) {
         switch (req.query.value)
         {
             case 'check':
-                return res.status(200).json(await Database.matchID(body.knr, body.checkProxy));
+                return res.status(200).json(await Database.matchID(body.knr));
 
             case 'add':
                 return res.status(200).json(await Database.add(body.knr, body.type, body.another, body.proxy));
+
+            case 'pass':
+                return res.status(200).json({ success: true, result: process.env.MONGODB_PASS === String(body.pass) })
 
             default:
                 return res.status(400);

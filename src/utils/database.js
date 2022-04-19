@@ -55,11 +55,10 @@ class Database
     }
 
     /**
-     * @param {string} knr 
-     * @param {boolean} checkProxy
+     * @param {string} knr
      * @returns {Promise<{ success: boolean, result: * }>}
      */
-    static async matchID(knr, checkProxy = false)
+    static async matchID(knr)
     {
         try 
         {
@@ -67,10 +66,9 @@ class Database
 
             let database = this.#connection.db(process.env.MONGODB_DB);
             let collection = database.collection('People');
-            let result = await collection.findOne( checkProxy 
-                ? { $or: [{ knr: String(knr) }, { proxy: String(knr) }] } 
-                : { knr: String(knr) });
-            return this.#success(Boolean(result)); 
+            let result1 = await collection.findOne({ knr: String(knr) });
+            let result2 = await collection.findOne({ proxy: String(knr) });
+            return this.#success({ knr: Boolean(result1), proxy: Boolean(result2) }); 
         }
         catch (error) 
         {
