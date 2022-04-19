@@ -24,7 +24,6 @@ const AnalyticsPopup = ({ clearData, close }) => {
             body: JSON.stringify({ pass: text })
         });
         let value = await response?.json();
-        console.log(text, value)
         setState(value.success && value.result
             ? PasswordState.Valid
             : PasswordState.Invalid)

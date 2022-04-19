@@ -81,7 +81,6 @@ const Analytics = () => {
     }
 
     const downloadDatabase = async () => {
-        console.log(state.data)
         let file = ToXLSX(state.data);
         ref.current.href = window.URL.createObjectURL(file);
         ref.current.setAttribute('download', 'Database.xlsx');
